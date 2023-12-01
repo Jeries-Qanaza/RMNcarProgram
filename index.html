@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RMN Car</title>
+  <link rel="stylesheet" type="text/css" href="./style.css">
+  <link rel="icon" href="https://static.wixstatic.com/media/11d6d3_e718bd64ea104a75a22ee55d7bdb8086~mv2.jpg">
+
+  
+</head>
+<body>
+  <script src="script.js"></script>
+  <img width="10%" id="cuteCar" src="https://static.wixstatic.com/media/11d6d3_e718bd64ea104a75a22ee55d7bdb8086~mv2.jpg" alt="RMNlogo">
+
+  <select name="Person" id="car" required>
+    <option value=""></option>
+    <option value="Sara Fornari">Sara Fornari</option>
+    <option value="Milad Shajrawi">Milad Shajrawi</option>
+    <option value="Nabil Abu Nicola">Nabil Abu Nicola</option>
+    <option value="Emad Abu Sinni">Emad Abu Sinni</option>
+    <option value="Gabi Tannous">Gabi Tannous</option>
+    <option value="Jeries Qanaza">Jeries Qanaza</option>
+  </select>
+
+  <input dir="rtl" id="placeInp" type="text" placeholder="المكان / place" required>
+
+  <button id="startTimeButton" onclick="startTime();">Start Time</button>
+  <button id="stopTimeButton" onclick="stopTime();" style="display: none;">Stop Time</button>
+  <div id="busyNote">Car Is Busy</div>
+
+  <div id="done" style="display: none;">
+    <h3>Name:       <span id="name"></span></h3>
+    <h3>Day:        <span id="day"></span></h3>
+    <h3>Date:       <span id="date"></span></h3>
+    <h3>Place:      <span id="place"></span></h3>
+    <h3>Start time: <span id="startTime"></span></h3>
+    <h3>End time:   <span id="endTime"></span></h3>
+  </div>
+
+  <form method="post" action="https://script.google.com/macros/s/AKfycbzzyo4sOJ6RNv82bR-W2nLKU1RMY-ut1HZLa23vbogfecx32b1QrEjcshNX0UTiE8Af/exec">
+    <input class="hideInp" type="text" name="date" id="formDate">
+    <input class="hideInp" type="text" name="day" id="formDay">
+    <input class="hideInp" type="text" name="start" id="formStartTime">
+    <input class="hideInp" type="text" name="end" id="formEndTime">
+    <input class="hideInp" type="text" name="name" id="formName">
+    <input class="hideInp" type="text" name="place" id="formPlace">
+    <input class="hideInp"  type="submit" id="submitBtn">
+  </form>
+</body>
+</html>
