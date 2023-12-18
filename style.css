@@ -43,6 +43,10 @@ select, #placeInp {
     text-align: center;
 }
 
+#startTimeButton:hover
+{
+    background-color: rgb(85, 210, 85);
+}
 #stopTimeButton {
     background-color: red;
 }
@@ -66,15 +70,23 @@ select, #placeInp {
     border-radius: 30px;
 }
 
-#done {
+#form{
     background-color: #3333334f;
     border-radius: 20px;
     width: 80%;
     max-width: 400px;
     padding: 5vh;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
-.hideInp {
-    display: none;
+.inp
+{
+    background-color:rgba(0, 0, 0, 0);
+    border: 0;
+    margin: 1vh;
+    width: 50%;
+    font-size: larger;
 }
 
