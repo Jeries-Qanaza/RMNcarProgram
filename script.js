@@ -4,26 +4,45 @@ var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
 var currentDay = dayNames[dayOfWeek];
 var formattedDate = date.toLocaleDateString('en-GB');
 
+
+//Booking anme / booking place ...
+//finisg all about the strat button
+
 let isCarOccupied = false;
 
+let booking = {
+  name:"",
+  place:"",
+  date:"",
+  day:"",
+  start:"",
+  end:-1
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   const startTimeButton = document.getElementById('startTimeButton');
   const stopTimeButton = document.getElementById('stopTimeButton');
+  const submitButton = document.getElementById('submitBtn');
   const busyDiv = document.getElementById('busyNote');
+  
+  startTimeButton.addEventListener('click', function () { startTime(); });//add event listener
+
+  stopTimeButton.addEventListener('click', function () { stopTime(); });//add event listener
+  
+  submitButton.addEventListener('click', function(){ submitFunc(); });//add event listener
 
   // Function to update the button status based on car occupancy
   function updateButtonStatus() {
+    console.log("in update btn func");
     fetch('/car-status')
       .then(response => response.json())
       .then(data => {
+        console.log("is car now busy : "+data.isOccupied);
         if (data.isOccupied) {
-          startTimeButton.style.display = 'none';
-          busyDiv.style.display = 'block';
-          document.getElementById("car").disabled = true;
-          document.getElementById("placeInp").disabled = true;
+          console.log("now it is");
+          busyUI(true);
         } else {
-          startTimeButton.style.background = ''; // Reset background color
+          busyUI(false);
         }
       })
       .catch(error => {
@@ -32,104 +51,128 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to send a POST request to update isCarOccupied
-  function sendUpdateToServer(isOccupied) {
-    fetch('/update-car-status', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ isOccupied }),
-    })
-      .then(response => response.text())
-      .then(message => {
-        console.log(message);
-      })
-      .catch(error => {
-        console.error('Error updating car status:', error);
-      });
-  }
+  
 
   // Call the updateButtonStatus function initially to set the button status on page load
-  updateButtonStatus();
 
   // Optionally, you can set up a timer to periodically update the status
   setInterval(updateButtonStatus, 5000);
 
-  startTimeButton.addEventListener('click', function () {
-    if (document.getElementById("placeInp").value == "") {
-      alert("Place data error!");
-      document.getElementById("placeInp").style.background = "red";
-    } else {
-      document.getElementById('placeInp').style.background = 'linear-gradient(to right, white, lightblue)';
-      sendUpdateToServer(true); // Send a POST request to update isCarOccupied to true
-      startTime();
-    }
-  });
-
-  stopTimeButton.addEventListener('click', function () {
-    sendUpdateToServer(false); // Send a POST request to update isCarOccupied to false
-    stopTime();
-  });
+ 
 
   // Rest of your existing code...
-});
 
 
-let startTimeCounting;
-function startTime() {
-  isCarOccupied = true;
 
-  if (document.getElementById("placeInp").value == "")
+  let startTimeCounting;
+
+  function startTime() 
   {
-    alert("Place data error!");
-    document.getElementById("placeInp").style.background = "red";
+    if (document.getElementById("placeInp").value == "")
+    {
+      alert("Place data error!");
+      document.getElementById("placeInp").style.background = "red";
+    }
+    else
+    {
+      console.log("Start:"); //print all data
+      console.log(booking); //print all data
+      get_user_input();
+      startTimeCounting=date.toLocaleTimeString();
+      document.getElementById('placeInp').style.background = 'linear-gradient(to right, white, lightblue)';
+      document.getElementById('startTimeButton').style.display = 'none';
+      document.getElementById('stopTimeButton').style.display = 'inline';
+      isCarOccupied = true;
+      sendUpdateToServer(); // Send a POST request to update isCarOccupied to false
+    }
   }
-  else
-  {
-    startTimeCounting=date.toLocaleTimeString();
-    document.getElementById('placeInp').style.background = 'linear-gradient(to right, white, lightblue)';
-    document.getElementById('startTimeButton').style.display = 'none';
-    document.getElementById('stopTimeButton').style.display = 'inline';
-  }
+
+  
+function sendUpdateToServer()
+{
+  console.log("Sending update to server...");
+  fetch('/update-car-status', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ isCarOccupied, booking}),
+  })
+    .then(response => response.text())
+    .then(message => {
+      console.log(message);
+    })
+    .catch(error => {
+      console.error('Error updating car status:', error);
+    });
 }
 
 function stopTime()
 {
-  isCarOccupied = false;
+  isCarOccupied = false; //update value
+
+  let date = new Date();
+  booking.end = date.toLocaleTimeString();
+
 
   // Remove the stored start time from localStorage
   localStorage.removeItem('startTimeStamp');
+  fillForm();
+  //sendUpdateToServer(); // Send a POST request to update isCarOccupied to false
 
-  var dateElement = document.querySelector('#done #date');
-  var dayElement = document.querySelector('#done #day');
-  var startTimeElement = document.querySelector('#done #startTime');
-  var endTimeElement = document.querySelector('#done #endTime');
-  var doneNameElement = document.querySelector('#done #name');
-  var placeElement = document.querySelector('#done #place');
-  date = new Date();
-  let sendDate = dateElement.textContent = formattedDate;
-  let sendDay = dayElement.textContent = currentDay;
-  let sendStartTime = startTimeElement.textContent=startTimeCounting;
-  let sendEndTime = endTimeElement.textContent = date.toLocaleTimeString();
-  let sendName = doneNameElement.textContent = document.getElementById('car').value;
-  let sendPlace = placeElement.textContent = document.getElementById("placeInp").value;
-  
-  fillForm(sendName, sendDay, sendDate, sendPlace, sendStartTime, sendEndTime);
 
-  document.getElementById('done').style.display = 'block';
+  document.getElementById('form').style.display = 'block';
   document.getElementById('startTimeButton').style.display = 'none';
   document.getElementById('stopTimeButton').style.display = 'none';
   document.getElementById('submitBtn').style.display = 'block';
 }
 
-function fillForm(sendName, sendDay, sendDate, sendPlace, sendStartTime, sendEndTime)
+
+// Function to update the form with the values of a car object
+function fillForm()
 {
-  document.getElementById("formDate").value = sendDate;
-  document.getElementById("formDay").value = sendDay;
-  document.getElementById("formStartTime").value = sendStartTime;
-  document.getElementById("formEndTime").value = sendEndTime;
-  document.getElementById("formName").value = sendName;
-  document.getElementById("formPlace").value = sendPlace;
+  document.getElementById("formName").value = booking.name
+  document.getElementById("formPlace").value = booking.place;
+  document.getElementById("formDate").value = booking.date;
+  document.getElementById("formDay").value = booking.day;
+  document.getElementById("formStartTime").value = booking.start;
+  document.getElementById("formEndTime").value = booking.end;
 }
 
+// Function to get all user data from HTML
+function get_user_input()
+{
+  let date = new Date();
+  booking.name = document.getElementById("namesMenu").value;
+  booking.place = document.getElementById("placeInp").value;
+  booking.date = date.toLocaleDateString('en-GB');
+  booking.day = currentDay;
+  booking.start = date.toLocaleTimeString();
+}
 
+function busyUI(doDisable)
+{
+  if (doDisable)
+  {
+    startTimeButton.style.display = 'none';
+    busyDiv.style.display = 'block';
+  }
+  else
+  {
+    startTimeButton.style.display = 'block';
+    //startTimeButton.style.background = ''; // Reset background color
+    busyDiv.style.display = 'none';
+    }
+  document.getElementById("namesMenu").disabled = doDisable;
+  document.getElementById("placeInp").disabled = doDisable;
+}
+
+function submitFunc()
+{
+  console.log("I have submitted");
+
+  isCarOccupied = false;
+  sendUpdateToServer()
+}
+  
+});
