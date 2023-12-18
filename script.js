@@ -19,17 +19,25 @@ let booking = {
   end:-1
 }
 
+let booking_info = booking;
+
+
 document.addEventListener('DOMContentLoaded', function () {
+  let userId = localStorage.getItem('userId');
+
   const startTimeButton = document.getElementById('startTimeButton');
   const stopTimeButton = document.getElementById('stopTimeButton');
   const submitButton = document.getElementById('submitBtn');
   const busyDiv = document.getElementById('busyNote');
   
+  
+
   startTimeButton.addEventListener('click', function () { startTime(); });//add event listener
 
   stopTimeButton.addEventListener('click', function () { stopTime(); });//add event listener
   
   submitButton.addEventListener('click', function(){ submitFunc(); });//add event listener
+
 
   // Function to update the button status based on car occupancy
   function updateButtonStatus() {
@@ -37,7 +45,13 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch('/car-status')
       .then(response => response.json())
       .then(data => {
-        console.log("is car now busy : "+data.isOccupied);
+        console.log("is car now busy : " + data.isOccupied);
+        console.log("I am reading new data after stop");
+        booking_info = data.booking_server_data;
+        console.log(booking_info);
+        console.log("---------And----------");
+        console.log("booking_info.name : --> " + booking_info.name);
+
         if (data.isOccupied) {
           console.log("now it is");
           busyUI(true);
@@ -51,7 +65,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to send a POST request to update isCarOccupied
-  
+  if (userId != null)
+  {
+    console.log("Not my first time");
+    document.getElementById('startTimeButton').style.display = 'none';
+    document.getElementById('stopTimeButton').style.display = 'block';
+    //busyUI(true);
+    console.log(booking_info);
+    document.getElementById("namesMenu").value = booking_info.name;///// I STOOPED HERE
+    document.getElementById("placeInp").value=booking_info.place;
+  }
 
   // Call the updateButtonStatus function initially to set the button status on page load
 
@@ -68,6 +91,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function startTime() 
   {
+   
+    if (userId === null) { //if no user id in storage, create one and save it to storage
+      console.log("I am here #1 if and first time");
+      userId = generateUserId();
+      localStorage.setItem('userId', userId);
+    }
+
     if (document.getElementById("placeInp").value == "")
     {
       alert("Place data error!");
@@ -77,8 +107,9 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       console.log("Start:"); //print all data
       console.log(booking); //print all data
+     
       get_user_input();
-      startTimeCounting=date.toLocaleTimeString();
+      startTimeCounting = date.toLocaleTimeString();
       document.getElementById('placeInp').style.background = 'linear-gradient(to right, white, lightblue)';
       document.getElementById('startTimeButton').style.display = 'none';
       document.getElementById('stopTimeButton').style.display = 'inline';
@@ -111,31 +142,30 @@ function stopTime()
 {
   isCarOccupied = false; //update value
 
-  let date = new Date();
-  booking.end = date.toLocaleTimeString();
+    let date = new Date();
+    booking.end = date.toLocaleTimeString();
+    // Remove the stored start time from localStorage
+ 
+    fillForm();
+    //sendUpdateToServer(); // Send a POST request to update isCarOccupied to false
+  
+    document.getElementById('form').style.display = 'block';
+    document.getElementById('startTimeButton').style.display = 'none';
+    document.getElementById('stopTimeButton').style.display = 'block';
+    document.getElementById('submitBtn').style.display = 'block';
+  
 
-
-  // Remove the stored start time from localStorage
-  localStorage.removeItem('startTimeStamp');
-  fillForm();
-  //sendUpdateToServer(); // Send a POST request to update isCarOccupied to false
-
-
-  document.getElementById('form').style.display = 'block';
-  document.getElementById('startTimeButton').style.display = 'none';
-  document.getElementById('stopTimeButton').style.display = 'none';
-  document.getElementById('submitBtn').style.display = 'block';
 }
 
 
 // Function to update the form with the values of a car object
 function fillForm()
 {
-  document.getElementById("formName").value = booking.name
-  document.getElementById("formPlace").value = booking.place;
-  document.getElementById("formDate").value = booking.date;
-  document.getElementById("formDay").value = booking.day;
-  document.getElementById("formStartTime").value = booking.start;
+  document.getElementById("formName").value = booking_info.name
+  document.getElementById("formPlace").value = booking_info.place;
+  document.getElementById("formDate").value = booking_info.date;
+  document.getElementById("formDay").value = booking_info.day;
+  document.getElementById("formStartTime").value = booking_info.start;
   document.getElementById("formEndTime").value = booking.end;
 }
 
@@ -173,6 +203,18 @@ function submitFunc()
 
   isCarOccupied = false;
   sendUpdateToServer()
+  localStorage.removeItem('userId'); 
 }
+  //////////////////////////////
+  //////////////////////////////
+  //////////////////////////////
   
+  function generateUserId() {
+    let rnd = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    console.log("My random number " +rnd);
+  return  rnd
+  }
+  
+
+
 });
