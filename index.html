@@ -6,12 +6,11 @@
   <title>RMN Car</title>
   <link rel="stylesheet" type="text/css" href="./style.css">
   <link rel="icon" href="https://static.wixstatic.com/media/11d6d3_e718bd64ea104a75a22ee55d7bdb8086~mv2.jpg">
-
-  
+  <script src="script.js"></script>
 </head>
 <body>
-  <script src="script.js"></script>
-  <img width="10%" id="cuteCar" src="https://static.wixstatic.com/media/11d6d3_e718bd64ea104a75a22ee55d7bdb8086~mv2.jpg" alt="RMNlogo">
+  
+  <img id="rmnlogo" src="https://static.wixstatic.com/media/11d6d3_e718bd64ea104a75a22ee55d7bdb8086~mv2.jpg" alt="RMNlogo">
 
   <select id="namesMenu" required>
     <option value=""></option>
@@ -24,9 +23,13 @@
   </select>
 
   <input dir="rtl" id="placeInp" type="text" placeholder="المكان / place" required>
-
+  <div id="loadingIcon" style="display: none;">
+        <img width="30vh" src="https://www.superiorlawncareusa.com/wp-content/uploads/2020/05/loading-gif-png-5.gif" alt="loading_gif">
+  </div>
   <button id="startTimeButton">Start Time</button>
   <button id="stopTimeButton" style="display: none;">Stop Time</button>
+
+
   <div id="busyNote">Car Is Busy</div>
 
   <form id="form" method="post" action="https://script.google.com/macros/s/AKfycbzzyo4sOJ6RNv82bR-W2nLKU1RMY-ut1HZLa23vbogfecx32b1QrEjcshNX0UTiE8Af/exec">
@@ -50,5 +53,7 @@
     </div>
       <input class="inp" type="submit" id="submitBtn">
   </form>
+   
+
 </body>
 </html>
